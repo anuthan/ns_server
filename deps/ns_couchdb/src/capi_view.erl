@@ -49,8 +49,7 @@ handle_with_auth(#httpd{mochi_req = MochiReq} = Req, Module) ->
             {_, _} ->
                 false;
             _ ->
-                %% backwards compat - allow anonymous access in pre 3.2 clusters
-                not cluster_compat_mode:is_cluster_40()
+                false
         end,
     case Allowed of
         true ->
