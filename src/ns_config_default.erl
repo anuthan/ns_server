@@ -273,6 +273,11 @@ default() ->
           _ -> undefined
       end},
 
+     {{metakv, <<"/indexing/settings/config">>},
+      json_settings_manager:build_settings_json(
+        index_settings_manager:default_settings_for_40(),
+        dict:new(),
+        index_settings_manager:known_settings_40())},
      %% {rest_creds, {User, {password, {Salt, Mac}}}}
      %% {rest_creds, null} means no login/password auth check.
      %% read_only_user_creds has the same format

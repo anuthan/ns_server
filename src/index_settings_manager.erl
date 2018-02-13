@@ -25,7 +25,8 @@
          get_from_config/3,
          update/2,
          update_txn/1,
-         config_upgrade_to_40/0,
+         default_settings_for_40/0,
+         known_settings_40/0,
          config_upgrade_to_45/1,
          is_memory_optimized/1]).
 
@@ -63,11 +64,6 @@ update(Key, Value) ->
 update_txn(Props) ->
     json_settings_manager:update_txn(?MODULE, Props).
 
-config_upgrade_to_40() ->
-    [{set, ?INDEX_CONFIG_KEY,
-      json_settings_manager:build_settings_json(default_settings_for_40(),
-                                                dict:new(), known_settings())}].
-
 config_upgrade_to_45(Config) ->
     JSON = json_settings_manager:fetch_settings_json(Config, ?INDEX_CONFIG_KEY),
     Current = json_settings_manager:decode_settings_json(JSON),
@@ -81,13 +77,16 @@ is_memory_optimized(?INDEX_STORAGE_MODE_MEMORY_OPTIMIZED) ->
 is_memory_optimized(_) ->
     false.
 
+known_settings_40() ->
+    [{memoryQuota, memory_quota_lens()},
+     {generalSettings, general_settings_lens()},
+     {compaction, compaction_lens()}].
+
 known_settings() ->
     known_settings(cluster_compat_mode:is_cluster_45()).
 
 known_settings(Is45) ->
-    RV = [{memoryQuota, memory_quota_lens()},
-          {generalSettings, general_settings_lens()},
-          {compaction, compaction_lens()}],
+    RV = known_settings_40(),
     case Is45 of
         true ->
             extra_known_settings_for_45() ++ RV;
